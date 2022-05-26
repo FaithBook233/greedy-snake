@@ -1,0 +1,7 @@
+"mian.obj",
+"delay.obj",
+"key.obj",
+"snake.obj",
+"display.obj" 
+TO "GameMachine" 
+RAMSIZE(256) 

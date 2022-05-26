@@ -1,0 +1,80 @@
+C51 COMPILER V9.01   DISPLAY                                                               04/20/2019 14:48:07 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE DISPLAY
+OBJECT MODULE PLACED IN display.OBJ
+COMPILER INVOKED BY: F:\App\keil\C51\BIN\C51.EXE display.c LARGE BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include"display.h"
+   2          #include"main.h"
+   3          #include"delay.h"
+   4          #include"display.h"
+   5          #include"key.h"
+   6          
+   7          //ÆÁÄ»³õÊ¼»¯
+   8          void cleanLED(u8 (*LED)[LED_WIDTH]){
+   9   1              u8 i,j;
+  10   1              for(i = 0;i<8;i++)
+  11   1                      for(j = 0;j<8;j++)
+  12   1                              LED[i][j] = 0;
+  13   1      }
+  14          void setCol(u8 col){
+  15   1              COL8 = col%2;
+  16   1              COL7 = col/2%2;
+  17   1              COL6 = col/4%2;
+  18   1              COL5 = col/8%2;
+  19   1              COL4 = col/16%2;
+  20   1              COL3 = col/32%2;
+  21   1              COL2 = col/64%2;
+  22   1              COL1 = col/128%2;
+  23   1      }
+  24          void setRow(u8 row){
+  25   1              ROW8 = row%2;
+  26   1              ROW7 = row/2%2;
+  27   1              ROW6 = row/4%2;
+  28   1              ROW5 = row/8%2;
+  29   1              ROW4 = row/16%2;
+  30   1              ROW3 = row/32%2;
+  31   1              ROW2 = row/64%2;
+  32   1              ROW1 = row/128%2;       
+  33   1      }
+  34          
+  35          //£¨x£¬y£©µãÁÁ x=[0,7],y =[0,7] 
+  36          void setPoint(u8 x,u8 y){
+  37   1              
+  38   1              u8 col = 0x80;
+  39   1              u8 row = 0x80;
+  40   1              setRow(row>>=y);
+  41   1              setCol(~(col>>=x));
+  42   1              delayUs(LED_DELAY_US);
+  43   1              setCol(0xff);
+  44   1      }
+  45          
+  46          void display(const u8 (*LED)[LED_WIDTH]){
+  47   1              u8 i,j;
+  48   1              for(i = 0;i<LED_HEIGHT;i++){
+  49   2                      for(j = 0;j<LED_WIDTH;j++){
+  50   3                              if(!LED[i][j])continue;
+  51   3                              setPoint(j,i);
+  52   3                      }
+  53   2              }
+  54   1      }
+  55          
+C51 COMPILER V9.01   DISPLAY                                                               04/20/2019 14:48:07 PAGE 2   
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    349    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      10
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

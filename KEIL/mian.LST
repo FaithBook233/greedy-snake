@@ -1,0 +1,42 @@
+C51 COMPILER V9.01   MIAN                                                                  04/20/2019 14:48:06 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MIAN
+OBJECT MODULE PLACED IN mian.OBJ
+COMPILER INVOKED BY: F:\App\keil\C51\BIN\C51.EXE mian.c LARGE BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include<reg52.h>
+   2          
+   3          #include"main.h"
+   4          #include"delay.h"
+   5          #include"key.h"
+   6          #include"display.h"
+   7          #include"gamelist.h"
+   8          
+   9          
+  10          
+  11          void main()                                               
+  12          {
+  13   1              u8 gameSelect = 0; //”Œœ∑—°‘Ò
+  14   1              while(1)
+  15   1              {
+  16   2                      (*Game[gameSelect])();
+  17   2                              
+  18   2              }       
+  19   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     33    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      3       1
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

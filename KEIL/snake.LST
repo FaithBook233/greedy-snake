@@ -1,0 +1,162 @@
+C51 COMPILER V9.01   SNAKE                                                                 04/20/2019 14:48:07 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE SNAKE
+OBJECT MODULE PLACED IN snake.OBJ
+COMPILER INVOKED BY: F:\App\keil\C51\BIN\C51.EXE snake.c LARGE BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include"snake.h"
+   2          #include<stdlib.h>
+   3          #include"key.h"
+   4          #include"display.h"
+   5          #include"main.h"
+   6          #include"delay.h"
+   7          ///////////////////////////////////////////////
+   8          ///////////////     贪吃蛇     ////////////////
+   9          ///////////////////////////////////////////////
+  10          
+  11          
+  12          void setDir(u8 *dir_1,u8 *dir_2,u8 value){
+  13   1              *dir_1 = 0;
+  14   1              *dir_2 = value;
+  15   1      }
+  16          
+  17          void setHead(u8 *z,u8 dir){
+  18   1              *z+=dir;
+  19   1              if(*z == -1)*z = 7;
+  20   1              else if(*z == 8)*z = 0;
+  21   1      }
+  22          
+  23          void moveSnakeXY(u8 *snakeXY,const u8 num,const u8 XY){
+  24   1              u8 i = 0;
+  25   1              while(i<num-1){
+  26   2                      snakeXY[i] = snakeXY[i+1];
+  27   2                      i++;
+  28   2              }
+  29   1              snakeXY[i] = XY;
+  30   1      }
+  31          
+  32          void changeLED(u8 (*led)[LED_WIDTH],const u8 *x,const u8 *y,u8 num,u8 apx,u8 apy){
+  33   1              int i = 0;
+  34   1              cleanLED(led);
+  35   1              while(i < num){
+  36   2                      led[y[i]][x[i]] = 1;
+  37   2                      i++;
+  38   2              }
+  39   1              led[apy][apx] = 1;                                                                                                                                              
+  40   1      }
+  41          
+  42          void randXY(u8 *x,u8 *y,u8 (*led)[LED_WIDTH],u8 t){
+  43   1              srand(t);
+  44   1              do{
+  45   2                      *x = rand()%8;
+  46   2                      *y = rand()%8; 
+  47   2              }while(led[*y][*x]); //若这个点上面为1，则继续，直到这个点上面为空
+  48   1              led[*y][*x] = 1;
+  49   1      }
+  50          void showDegree(u8 degree){
+  51   1              u8 i,j;
+  52   1              for(i = 0;i<LED_HEIGHT;i++)
+  53   1                      for(j = 0;j<=degree;j++)
+  54   1                              setPoint(j,i);  
+  55   1      }
+C51 COMPILER V9.01   SNAKE                                                                 04/20/2019 14:48:07 PAGE 2   
+
+  56          u8 Snake(void){
+  57   1              #define BLOCKNUM 64     //蛇身数组大小
+  58   1              u8 degree = 0,snakeNum = 1,dirX = 1,dirY = 0,dirOX,dirOY; //难度等级，当前蛇身长度，方向变量
+  59   1              u8 LED[LED_HEIGHT][LED_WIDTH];//界面显示矩阵
+  60   1              u8 headX = 0,headY = 0,appleX,appleY;   //蛇头位置变量   食物位置变量
+  61   1              u8 t,time; //移动速度控制变量
+  62   1              u8 r = 0;
+  63   1              //蛇身位置数组
+  64   1              u8 snakeX[BLOCKNUM];
+  65   1              u8 snakeY[BLOCKNUM];
+  66   1              while(1){ //难度选择
+  67   2                      showDegree(degree);
+  68   2                      if(keySelect())
+  69   2                              if(degree<7)degree++;
+  70   2                              else degree = 0;
+  71   2                      else if(keyStart())break;
+  72   2              }       
+  73   1              time = 100-degree*10;//延时长度
+  74   1              cleanLED(LED);//清屏
+  75   1              LED[headY][headX] = 1;//显示蛇头
+  76   1              //将蛇头保存到数组第一位
+  77   1              snakeX[0] = headX;
+  78   1              snakeY[0] = headY;
+  79   1              //运动方向初始化
+  80   1              dirOX = dirX;
+  81   1              dirOY = dirY;
+  82   1              //随机食物出现的位置
+  83   1              randXY(&appleX,&appleY,LED,t);
+  84   1              t = 0;
+  85   1              while(1){ 
+  86   2                      /*
+  87   2                        游戏主循环
+  88   2                      */
+  89   2                      display(LED);//显示     
+  90   2      //              //按键操作检测，防止多余的按键判断，获取最近一次的方向          
+  91   2                      if(dirY!=-1 && (keyUP()||keyY()))setDir(&dirX,&dirY,-1);
+  92   2                      else if(dirY!=1 &&(keyDOWN()||keyA()))setDir(&dirX,&dirY,1);
+  93   2                      else if(dirX!=-1 &&(keyLEFT()||keyX()))setDir(&dirY,&dirX,-1);
+  94   2                      else if(dirX!=1 &&(keyRIGHT()||keyB()))setDir(&dirY,&dirX,1);
+  95   2                      
+  96   2                      //暂停
+  97   2                      if(keyStart())
+  98   2                              while(!keyStart())
+  99   2                                      display(LED);
+ 100   2                                                                      
+ 101   2                      /*
+ 102   2                              每隔一定时间进行移动
+ 103   2                              以下代码功能为移动判断与移动操作
+ 104   2                      */
+ 105   2                      r++;//时间种子
+ 106   2                      if(t++ >time){   //间隔性的移动
+ 107   3                              t = 0;
+ 108   3                              if((dirX!=0 && dirOX ==0)||(dirY!=0 && dirOY==0)){//合法方向输入引用
+ 109   4                                      dirOX = dirX;
+ 110   4                                      dirOY = dirY;
+ 111   4                              }                               
+ 112   3                              setHead(&headX,dirOX);  //按照合法的输入方向提前运动一次
+ 113   3                              setHead(&headY,dirOY);                  
+ 114   3                              if(headY == appleY && headX == appleX){         //若蛇头运行的下一位是食物
+ 115   4                                              //数组加长
+ 116   4                                              snakeNum++;
+ 117   4                                              snakeX[snakeNum-1] = appleX;
+C51 COMPILER V9.01   SNAKE                                                                 04/20/2019 14:48:07 PAGE 3   
+
+ 118   4                                              snakeY[snakeNum-1] = appleY;
+ 119   4                                              //下一个苹果
+ 120   4                                              randXY(&appleX,&appleY,LED,r);
+ 121   4                              }else if(!LED[headY][headX]){                           //若前方为无障碍物
+ 122   4                                       //前方无障碍
+ 123   4                                      moveSnakeXY(snakeX,snakeNum,headX);
+ 124   4                                      moveSnakeXY(snakeY,snakeNum,headY);
+ 125   4                              }else if(headX == snakeX[0]&& headY == snakeY[0]){//
+ 126   4                                      moveSnakeXY(snakeX,snakeNum,headX);
+ 127   4                                      moveSnakeXY(snakeY,snakeNum,headY);
+ 128   4                              }else {                         //若前方有障碍物体，则触发蜂鸣器并返回错误值                    
+ 129   4                                      return GAMEOVER;
+ 130   4                              }
+ 131   3                              changeLED(LED,snakeX,snakeY,snakeNum,appleX,appleY);//显示矩阵刷新
+ 132   3                      }
+ 133   2              }
+ 134   1              return GAMEOVER;//游戏结束，返回错误信息
+ 135   1      }                                                                                                       
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1300    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----     244
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
